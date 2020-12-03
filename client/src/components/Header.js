@@ -1,23 +1,62 @@
-import React from 'react';
+import React from "react";
 import styled from "styled-components";
+import Brand from "../icons/Brand";
 import axios from "axios";
+import { BrowserRouter, NavLink } from "react-router-dom";
 
 const Root = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  background-color: #6B6B6B;
+  background-color: #6b6b6b;
   height: 65px;
   width: 100vw;
+  padding: 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
 `;
 
+const BrandWrapper = styled.div`
+  padding-left: 50px;
+`;
+
+const NavlinkWrapper = styled.div`
+  padding-left: 50px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 150px;
+`;
+
+const activeClassName = "nav-item-active";
+
+const StyledLink = styled(NavLink).attrs({ activeClassName })`
+  &.${activeClassName} {
+    border-bottom: 2px solid #5DD7FC;
+  }
+  text-decoration: none;
+  color: white;
+`;
+
+
+//flex
 
 const Header = () => {
   return (
     <Root>
+      <BrandWrapper>
+        <Brand />
+      </BrandWrapper>
+      <NavlinkWrapper>
+        <StyledLink exact to="/">
+          Home
+        </StyledLink>
+        <StyledLink exact to="/about">
+          About
+        </StyledLink>
+      </NavlinkWrapper>
     </Root>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;
