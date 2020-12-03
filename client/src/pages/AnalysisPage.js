@@ -8,8 +8,6 @@ const Root = styled.div`
   justify-content: center;
   align-items: center;
   background-color: whitesmoke;
-  height: 100vh;
-  width: 100vw;
 `;
 
 const AnalysisPage = () => {
