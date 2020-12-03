@@ -12,7 +12,7 @@ const Root = styled.div`
   width: 100vw;
 `;
 
-const DataWrapper = () => {
+const AnalysisPage = () => {
   return (
     <Root>
       <Person />
@@ -20,4 +20,4 @@ const DataWrapper = () => {
   );
 };
 
-export default DataWrapper;
+export default AnalysisPage;
