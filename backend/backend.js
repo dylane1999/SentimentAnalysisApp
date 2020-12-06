@@ -20,11 +20,11 @@ app.listen(5000, function () {
   console.log("server starting...");
 });
 
-// const twitter_base_url = "https://api.twitter.com/2";
-// const instance = axios.create({
-//   baseURL: twitter_base_url,
-//   headers: { Authorization: `Bearer ${process.env.bearer_token}` },
-// });
+const twitter_base_url = "https://api.twitter.com/2";
+const instance = axios.create({
+  baseURL: twitter_base_url,
+  headers: { Authorization: `Bearer ${process.env.bearer_token}` },
+});
 
 // analyze/id/ endpoint...
 app.post("/analyze/:id", function (request, response) {
@@ -126,7 +126,7 @@ function tweetIdIsValid(tweet_response) {
    * @param tweet_response -> the response from Twitters API /2/tweets?ids
    * @returns : true is a key named "data" exists, false otherwise.
    */
-  return tweet_response.data ? irue : false;
+  return tweet_response.data ? true : false;
 }
 
 function responseForFrontendIsError(responseForFrontend) {
