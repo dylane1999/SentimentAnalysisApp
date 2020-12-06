@@ -24,7 +24,7 @@ const Person = () => {
 
   async function getUser() {
     try {
-      const response = await axios.get('/api');
+      const response = await axios.get('/google/test');
       console.log(response);
     } catch (error) {
       console.error(error);

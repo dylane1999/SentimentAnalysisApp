@@ -18,7 +18,6 @@ function App() {
   return (
     <Router>
     <GlobalStyle />
-      <Header/>
       <Switch>
         <Route exact path="/" component={AnalysisPage} />
         <Route exact path="/about" component={AboutPage} />
