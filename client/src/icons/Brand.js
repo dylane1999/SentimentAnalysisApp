@@ -2,7 +2,6 @@ import React from "react";
 
 const Brand = () => {
   return (
-    <div>
       <svg
         width="46"
         height="43"
@@ -17,7 +16,6 @@ const Brand = () => {
           fill="#5DD7FC"
         />
       </svg>
-    </div>
   );
 };
 
