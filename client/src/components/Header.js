@@ -13,6 +13,9 @@ const Root = styled.div`
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
+  position: fixed;
+  top: 0px;    
+  z-index: 40;
 `;
 
 const BrandWrapper = styled.div`
