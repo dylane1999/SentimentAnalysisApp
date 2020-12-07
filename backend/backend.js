@@ -1,11 +1,17 @@
 import express from "express"; // backend api
 import axios from "axios"; // requests!
 
+
 // MIDDLEWARE!
 import cors from "cors"; // enforce CORS, will be set to frontend URL when deployed
 import morgan from "morgan"; // useful for tracking request logs
 import helmet from "helmet"; // ensures max security for server
 import StatusCodes from "http-status-codes"; // status codes!
+import bodyParser from "body-parser";
+import language from "@google-cloud/language";
+import dotenv from "dotenv";
+dotenv.config({ path: "./.env" });
+
 
 const app = express();
 const cors_conf = {
@@ -16,6 +22,7 @@ const cors_conf = {
 app.use(morgan("common"));
 app.use(cors(cors_conf));
 app.use(helmet());
+app.use(bodyParser.json()); // for parsing application/json
 app.listen(5000, function () {
   console.log("server starting...");
 });
@@ -148,3 +155,60 @@ function responseForFrontendIsError(responseForFrontend) {
     responseForFrontend.text !== null
   );
 }
+
+/**
+ * Requests to google NLP
+ */
+
+app.post("/google/analyze", async (req, res) => {
+  const { doc } = req.body;
+  try {
+    console.log(process.env.GOOGLE_APPLICATION_CREDENTIALS, process.env.TEST, "\n");
+    const response = await analyzeSentiment(doc)
+    
+    if (response) {
+      res.send(response);
+    }
+  } catch (err) {
+    res.status(401).send("error");
+  }
+
+});
+
+async function analyzeSentiment(doc) {
+    /**
+   * function to make request to google NLP api
+   *
+   * @param doc -> the text that will be analyzed
+   * @returns : result from the api, containing a score and magnitude
+   */
+  try {
+    // Instantiates a client
+    const client = new language.LanguageServiceClient();
+
+    // The text to analyze
+    const text = doc;
+
+    const document = {
+      content: text,
+      type: "PLAIN_TEXT",
+    };
+
+    // Detects the sentiment of the text
+    const [result] = await client.analyzeSentiment({ document: document });
+    const sentiment = result.documentSentiment;
+
+    console.log(`Text: ${text}`);
+    console.log(`Sentiment score: ${sentiment.score}`);
+    console.log(`Sentiment magnitude: ${sentiment.magnitude}`);
+
+    if (result) {
+      return result;
+    }
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+
+
