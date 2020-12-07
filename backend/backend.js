@@ -58,8 +58,6 @@ app.post("/analyze/:id", async function (request, response) {
       // ! implement request for Google NLP API here...
       try {
         let googleNlpResponse = await analyzeSentiment(responseForGoogle.text);
-        console.log("HEREHRER");
-        console.log(googleNlpResponse);
 
         if (typeof googleNlpResponse === "undefined") {
           response.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
