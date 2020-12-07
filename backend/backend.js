@@ -1,7 +1,6 @@
 import express from "express"; // backend api
 import axios from "axios"; // requests!
 
-
 // MIDDLEWARE!
 import cors from "cors"; // enforce CORS, will be set to frontend URL when deployed
 import morgan from "morgan"; // useful for tracking request logs
@@ -12,10 +11,9 @@ import language from "@google-cloud/language";
 import dotenv from "dotenv";
 dotenv.config({ path: "./.env" });
 
-
 const app = express();
 const cors_conf = {
-  origin: ["http://localhost:5000"], // temporary
+  origin: ["http://localhost:5000"], // ! temporary
   methods: ["POST"],
 };
 
@@ -28,13 +26,14 @@ app.listen(5000, function () {
 });
 
 const twitter_base_url = "https://api.twitter.com/2";
+
 const instance = axios.create({
   baseURL: twitter_base_url,
   headers: { Authorization: `Bearer ${process.env.bearer_token}` },
 });
 
 // analyze/id/ endpoint...
-app.post("/analyze/:id", function (request, response) {
+app.post("/analyze/:id", async function (request, response) {
   const id_length = request.params.id.length;
 
   if (id_length !== 19) {
@@ -43,38 +42,78 @@ app.post("/analyze/:id", function (request, response) {
       message: "ID must be a 19-character long Tweet ID.",
     });
   } else {
-    let tweet_id = request.params.id;
-    let twitter_formatted_url = buildURL(tweet_id);
-    instance.get(twitter_formatted_url).then((res) => {
-      let responseForFrontend = sendRequestToTwitter(res);
-      responseForFrontend.then((data) => {
-        if (responseForFrontendIsError(data)) {
-          response.status(StatusCodes.BAD_REQUEST).json(data);
+    let tweetId = request.params.id;
+    let twitterFormattedUrl = buildURL(tweetId);
+    console.log(`URL for Twitter Request: ${twitterFormattedUrl}`);
+    let responseFromTwitter = await instance.get(twitterFormattedUrl);
+    console.log("Response from Twitter:\n");
+    console.log(responseFromTwitter.data.data);
+    let responseForGoogle = await parseTwitterResponse(responseFromTwitter);
+    console.log("Response for Google NLP API:\n");
+    console.log(responseForGoogle);
+
+    if (responseForGoogleIsError(responseForGoogle)) {
+      response.status(StatusCodes.BAD_REQUEST).json(responseForGoogle);
+    } else {
+      // ! implement request for Google NLP API here...
+      try {
+        let googleNlpResponse = await analyzeSentiment(responseForGoogle.text);
+
+        if (typeof googleNlpResponse === "undefined") {
+          response.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            error: "The Response from the Google NLP API is undefined.",
+            message:
+              "Try again, and if this issue persists contact support or open an issue on GitHub.",
+          });
         } else {
-          response.status(StatusCodes.OK).json(data);
+          // ! DEBUGGING START
+          console.log("Google NLP Response:\n");
+          console.log(
+            `Document Sentiment\n1. MAGNITUDE: ${googleNlpResponse.documentSentiment.magnitude}\n2. SCORE: ${googleNlpResponse.documentSentiment.score}`
+          );
+          console.log("Sentence Sentiment:\n");
+          console.log(googleNlpResponse.sentences);
+          // ! DEBUGGING END
+
+          response.status(StatusCodes.OK).json(googleNlpResponse); // for now, sending back entire payload from google...
         }
-      });
-    });
+      } catch (error) {
+        /**
+         * This should only ever happen if:
+         * 1. Something is going on with the Google NLP API
+         * .
+         * .
+         * .
+         * ¯\_(ツ)_/¯
+         */
+
+        response.status(StatusCodes.BAD_GATEWAY).json({
+          error: error.message,
+          message:
+            "Try again, and if this issue persists contact support or open an issue on GitHub.",
+        });
+      }
+    }
   }
 });
 
-async function sendRequestToTwitter(twitter_response) {
+async function parseTwitterResponse(twitterResponse) {
   /**
-   * send GET request to twitters /2/tweets/?id=[tweet ID] endpoint.
+   * parses the JSON data retrieved from Twitters response object.
    *
-   * @param twitter_response -> ``JSON response``, the response from Twitter.
+   * @param twitterResponse -> ``JSON response``, the response from Twitter.
    * @returns : an Object containing data about the tweet (tweet text, author, time, etc...)
    */
 
   console.log("sending request to twitter...");
   try {
-    let twitter_json_data = twitter_response.data;
-    let tweet_text = await extractText(twitter_json_data);
-    let tweet_id = await extractId(twitter_json_data);
-    console.log(tweet_id, tweet_text);
+    let twitterJsonData = twitterResponse.data;
+    let tweetText = await extractText(twitterJsonData);
+    let tweetId = await extractId(twitterJsonData);
+    console.log(tweetId, tweetText);
     return {
-      text: tweet_text,
-      id: tweet_id,
+      text: tweetText,
+      id: tweetId,
     };
   } catch (error) {
     console.error(error.message);
@@ -84,59 +123,59 @@ async function sendRequestToTwitter(twitter_response) {
     };
   }
 }
-function buildURL(tweet_id) {
+function buildURL(tweetId) {
   /**
    * helper function that builds the twitter URL to send the GET request to.
    *
-   * @param tweet_id -> ``string`` the ID of the tweet to request.
+   * @param tweetId -> ``string`` the ID of the tweet to request.
    * @returns fully-formatted Twitter URL.
    */
-  let endpoint_and_param = `/tweets?ids=${tweet_id}`;
-  return twitter_base_url.concat(endpoint_and_param);
+  let endpointAndParam = `/tweets?ids=${tweetId}`;
+  return twitter_base_url.concat(endpointAndParam);
 }
 
-function extractId(tweet_response) {
+function extractId(tweetResponse) {
   /**
    * extract the tweet ID from the tweet response object.
    *
-   * @param tweet_response -> tweet response object from GET request sent to /tweets?ids=[ids...]
+   * @param tweetResponse -> tweet response object from GET request sent to /tweets?ids=[ids...]
    * @returns : the ID of the first tweet in the response object.
    * */
-  if (tweetIdIsValid(tweet_response)) {
-    return tweet_response.data[0].id;
+  if (tweetIdIsValid(tweetResponse)) {
+    return tweetResponse.data[0].id;
   } else {
-    return tweet_response.errors[0].value;
+    return tweetResponse.errors[0].value;
   }
 }
 
-function extractText(tweet_response) {
+function extractText(tweetResponse) {
   /**
    * extract the tweet text from the tweet response object.
    *
-   * @param tweet_response -> tweet response object from GET request sent to /tweets?ids=[ids...]
+   * @param tweetResponse -> tweet response object from GET request sent to /tweets?ids=[ids...]
    * @returns : the text of the first tweet in the response object.
    * */
-  if (tweetIdIsValid(tweet_response)) {
-    return tweet_response.data[0].text;
+  if (tweetIdIsValid(tweetResponse)) {
+    return tweetResponse.data[0].text;
   } else {
     return {
-      message: tweet_response.errors[0].title,
-      error: tweet_response.errors[0].detail,
+      message: tweetResponse.errors[0].title,
+      error: tweetResponse.errors[0].detail,
     };
   }
 }
 
-function tweetIdIsValid(tweet_response) {
+function tweetIdIsValid(tweetResponse) {
   /**
    * helper function to check if the tweet 19-character ID passed is valid.
    *
-   * @param tweet_response -> the response from Twitters API /2/tweets?ids
+   * @param tweetResponse -> the response from Twitters API /2/tweets?ids
    * @returns : true is a key named "data" exists, false otherwise.
    */
-  return tweet_response.data ? true : false;
+  return tweetResponse.data ? true : false;
 }
 
-function responseForFrontendIsError(responseForFrontend) {
+function responseForGoogleIsError(responseForGoogle) {
   /**
    * check if response sent to frontend is 200 OK...
    *
@@ -146,37 +185,18 @@ function responseForFrontendIsError(responseForFrontend) {
    * In this context, .text should never be null.
    * https://stackoverflow.com/questions/8511281/check-if-a-value-is-an-object-in-javascript
    *
-   * @param responseForFrontend -> the response being sent to the frontend.
+   * @param responseForGoogle -> the response being sent to the frontend.
    * @returns boolean value denoting whether the response is valid or not. true is error, false is not.
    *
    */
   return (
-    typeof responseForFrontend.text === "object" &&
-    responseForFrontend.text !== null
+    typeof responseForGoogle.text === "object" &&
+    responseForGoogle.text !== null
   );
 }
 
-/**
- * Requests to google NLP
- */
-
-app.post("/google/analyze", async (req, res) => {
-  const { doc } = req.body;
-  try {
-    console.log(process.env.GOOGLE_APPLICATION_CREDENTIALS, process.env.TEST, "\n");
-    const response = await analyzeSentiment(doc)
-    
-    if (response) {
-      res.send(response);
-    }
-  } catch (err) {
-    res.status(401).send("error");
-  }
-
-});
-
 async function analyzeSentiment(doc) {
-    /**
+  /**
    * function to make request to google NLP api
    *
    * @param doc -> the text that will be analyzed
@@ -209,6 +229,3 @@ async function analyzeSentiment(doc) {
     console.log(err);
   }
 }
-
-
-
