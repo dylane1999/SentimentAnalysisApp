@@ -4,9 +4,18 @@ import Header from "./components/Header";
 import styled from "styled-components";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { GlobalStyle } from "./styles/GlobalStyles";
+import { createStore, applyMiddleware } from "redux";
 import { Provider } from "react-redux";
-import store from "./redux/store";
+import appReducer from "./reducers";
+import reduxThunk from "redux-thunk";
+import logger from "redux-logger";
+import { composeWithDevTools } from "redux-devtools-extension";
 
+
+const store = createStore(
+	appReducer,
+	composeWithDevTools(applyMiddleware(reduxThunk, logger))
+);
 
 const Root = styled.div`
   background-color: #6b6b6b;
