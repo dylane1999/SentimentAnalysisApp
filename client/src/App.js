@@ -1,14 +1,24 @@
 import AnalysisPage from "./pages/AnalysisPage";
 import AboutPage from "./pages/AboutPage";
-import Header from "./components/Header"
+import Header from "./components/Header";
 import styled from "styled-components";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { GlobalStyle } from './styles/GlobalStyles';
+import { GlobalStyle } from "./styles/GlobalStyles";
+import { createStore, applyMiddleware } from "redux";
+import { Provider } from "react-redux";
+import appReducer from "./reducers";
+import reduxThunk from "redux-thunk";
+import logger from "redux-logger";
+import { composeWithDevTools } from "redux-devtools-extension";
 
 
+const store = createStore(
+	appReducer,
+	composeWithDevTools(applyMiddleware(reduxThunk, logger))
+);
 
 const Root = styled.div`
-  background-color: #6B6B6B;
+  background-color: #6b6b6b;
   height: 100vh;
   width: 100vw;
   margin: 0px;
@@ -16,13 +26,15 @@ const Root = styled.div`
 
 function App() {
   return (
-    <Router>
-    <GlobalStyle />
-      <Switch>
-        <Route exact path="/" component={AnalysisPage} />
-        <Route exact path="/about" component={AboutPage} />
-      </Switch>
-    </Router>
+    <Provider store={store}>
+      <Router>
+        <GlobalStyle />
+        <Switch>
+          <Route exact path="/" component={AnalysisPage} />
+          <Route exact path="/about" component={AboutPage} />
+        </Switch>
+      </Router>
+    </Provider>
   );
 }
 
