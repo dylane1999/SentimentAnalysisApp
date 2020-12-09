@@ -13,7 +13,7 @@ const Root = styled.div`
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
-  position: fixed;
+  /*position: fixed;*/
   top: 0px;    
   z-index: 40;
 `;
@@ -52,7 +52,7 @@ const Header = () => {
       </BrandWrapper>
       <NavlinkWrapper>
         <StyledLink exact to="/">
-          Home
+          Home 
         </StyledLink>
         <StyledLink exact to="/about">
           About
@@ -61,5 +61,6 @@ const Header = () => {
     </Root>
   );
 };
+
 
 export default Header;

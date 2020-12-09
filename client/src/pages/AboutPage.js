@@ -16,7 +16,6 @@ const AboutPage = () => {
   return (
     <Root>
       <Header/>
-      
     </Root>
   )
 }
