@@ -8,7 +8,7 @@ import * as Yup from "yup";
 
 const Root = styled.div`
   background-color: #515151;
-  height: 550px;
+  height: 600px;
   width: 100vw;
   display: flex;
   flex-direction: column;

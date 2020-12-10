@@ -1,6 +1,55 @@
-import React, { useState, useEffect } from "react";
-import getBackendData from "../actions/getBackendData";
+import React, { useState } from "react";
 import styled from "styled-components";
+import BarChart from "./BarChart";
+import IOSSwitch from "./IOSSwitch";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import getBackendData from "../actions/getBackendData";
+
+
+const Root = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 800px;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  background-color: #6b6b6b;
+`;
+const AnalysisWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 60vw;
+  background-color: #cccccc;
+`;
+
+const SwitchWrapper = styled.div`
+  display: flex;
+  width: 50vw;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+`;
+
+const ToggleWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
+
+const ButtonHeading = styled.div`
+  font-family: aktiv-grotesk;
+  color: white;
+  font-size: 12px;
+`;
+
+const AnalysisHeading = styled.div`
+  font-family: aktiv-grotesk;
+  color: white;
+  font-size: 24px;
+  padding: 25px;
+`;
 
 // flexbox container for the analysis card
 const AnalysisContainer = styled.div`
@@ -55,7 +104,24 @@ const AnalysisTweetMeta = styled.div`
   padding-bottom: 5%;
 `;
 
-function useAsyncHook(tweetId) {
+const AnalysisHeadingWrapper = styled.div`
+  display: flex;
+  width: 100vw;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
+const TweetAnalysis = () => {
+  const [documentAnalysis, toggleAnalysis] = useState(true);
+
+  const handleAnalysisChange = (params) => {
+    toggleAnalysis(!documentAnalysis);
+  };
+  
+  const tweetId = props.tweetUrl ? props.tweetUrl.split("/")[props.tweetUrl.split("/").length - 1] : false;
+  const result = useAsyncHook(tweetId);
+  
+  function useAsyncHook(tweetId) {
   /**
    * asynchronous call to the backend API.
    * 
@@ -82,34 +148,56 @@ function useAsyncHook(tweetId) {
   return tweetData;
 }
 
-const TweetAnalysis = (props) => {
-  const tweetId = props.tweetUrl ? props.tweetUrl.split("/")[props.tweetUrl.split("/").length - 1] : false;
-  const result = useAsyncHook(tweetId);
   
-  console.log(result, props);
   
-  if (result) {
-    return (
-      <AnalysisContainer>
-        <AnalysisHeader>Sentiment Analysis</AnalysisHeader>
-        {
-          <AnalysisCard>
-            <AnalysisUserInfo>
-              {/* !  IMAGE IS COMMENTED OUT BELOW */}
-              {/* <img height="65" width ="65" src={result.twitter.user.url} alt="Twitter Profile" style={{borderRadius:15}}></img> */}
-              @{result.twitter.user.profileName}
-            </AnalysisUserInfo>
-            <AnalysisTweetText>{result.twitter.tweet.text}</AnalysisTweetText>
-            <AnalysisTweetMeta>
-              {result.twitter.tweet.createdTime}
-            </AnalysisTweetMeta>
-          </AnalysisCard>
-        }
-      </AnalysisContainer>
-    );
-  } else {
-    return <div></div>;
-  }
+  return (
+    <Root>
+      <AnalysisHeadingWrapper><AnalysisHeading> Document </AnalysisHeading> </AnalysisHeadingWrapper>
+      <SwitchWrapper>
+        <ToggleWrapper>
+          <ButtonHeading>switch to sentance</ButtonHeading>
+          <IOSSwitch
+            checked={documentAnalysis}
+            onChange={handleAnalysisChange}
+          />
+        </ToggleWrapper>
+      </SwitchWrapper>
+      <AnalysisWrapper>
+        <BarChart
+          labels={["magnitude", "sentiment score"]}
+          data={[0.5, 0.7, 0, 1]}
+          title={"Document"}
+        />
+        {/* {here conditionally render document vs sentances analysis} */}
+      </AnalysisWrapper>
+    </Root>
+  );
 };
-
+//props.setTweetSearched function to set tgrue when searched
 export default TweetAnalysis;
+
+// BarChart.propTypes = {
+//   labels: PropTypes.array.isRequired,
+//   data: PropTypes.array.isRequired,
+//   title: PropTypes.string.isRequired,
+// };
+
+
+     // <AnalysisContainer>
+       // <AnalysisHeader>Sentiment Analysis</AnalysisHeader>
+        //{
+        //  <AnalysisCard>
+        //    <AnalysisUserInfo>
+       //       {/* !  IMAGE IS COMMENTED OUT BELOW */}
+      //        {/* <img height="65" width ="65" src={result.twitter.user.url} alt="Twitter Profile" style={{borderRadius:15}}></img> */}
+     //         @{result.twitter.user.profileName}
+    //        </AnalysisUserInfo>
+    //        <AnalysisTweetText>{result.twitter.tweet.text}</AnalysisTweetText>
+   //         <AnalysisTweetMeta>
+   //           {result.twitter.tweet.createdTime}
+    //        </AnalysisTweetMeta>
+    //      </AnalysisCard>
+   //     }
+    //  </AnalysisContainer>
+          
+          
