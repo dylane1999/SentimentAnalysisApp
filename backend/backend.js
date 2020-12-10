@@ -25,16 +25,17 @@ app.listen(5000, function () {
   console.log("server starting...");
 });
 
-const twitter_base_url = "https://api.twitter.com/2";
+const twitterBaseUrl = "https://api.twitter.com/2";
 
 const instance = axios.create({
-  baseURL: twitter_base_url,
+  baseURL: twitterBaseUrl,
   headers: { Authorization: `Bearer ${process.env.bearer_token}` },
 });
 
 // analyze/id/ endpoint...
 app.post("/analyze/:id", async function (request, response) {
   const id_length = request.params.id.length;
+  const finalResponseObj = {}; // response object for frontend, containing two keys: "Google" and "Twitter".
 
   if (id_length !== 19) {
     response.status(StatusCodes.BAD_REQUEST).json({
@@ -47,17 +48,19 @@ app.post("/analyze/:id", async function (request, response) {
     console.log(`URL for Twitter Request: ${twitterFormattedUrl}`);
     let responseFromTwitter = await instance.get(twitterFormattedUrl);
     console.log("Response from Twitter:\n");
-    console.log(responseFromTwitter.data.data);
+    console.log(responseFromTwitter.data);
     let responseForGoogle = await parseTwitterResponse(responseFromTwitter);
     console.log("Response for Google NLP API:\n");
     console.log(responseForGoogle);
+
+    finalResponseObj["twitter"] = responseForGoogle;
 
     if (responseForGoogleIsError(responseForGoogle)) {
       response.status(StatusCodes.BAD_REQUEST).json(responseForGoogle);
     } else {
       // ! implement request for Google NLP API here...
       try {
-        let googleNlpResponse = await analyzeSentiment(responseForGoogle.text);
+        let googleNlpResponse = await analyzeSentiment(responseForGoogle.tweet.text);
 
         if (typeof googleNlpResponse === "undefined") {
           response.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -75,7 +78,9 @@ app.post("/analyze/:id", async function (request, response) {
           console.log(googleNlpResponse.sentences);
           // ! DEBUGGING END
 
-          response.status(StatusCodes.OK).json(googleNlpResponse); // for now, sending back entire payload from google...
+          finalResponseObj["google"] = googleNlpResponse;
+
+          response.status(StatusCodes.OK).json(finalResponseObj); // for now, sending back entire payload from google...
         }
       } catch (error) {
         /**
@@ -105,21 +110,41 @@ async function parseTwitterResponse(twitterResponse) {
    * @returns : an Object containing data about the tweet (tweet text, author, time, etc...)
    */
 
-  console.log("sending request to twitter...");
-  try {
-    let twitterJsonData = twitterResponse.data;
-    let tweetText = await extractText(twitterJsonData);
-    let tweetId = await extractId(twitterJsonData);
-    console.log(tweetId, tweetText);
+  console.log("parsing twitter response...");
+  if (tweetIdIsValid(twitterResponse)) {
+    try {
+      let twitterJsonData = twitterResponse.data;
+      let tweetText = await extractText(twitterJsonData);
+      let tweetId = await extractId(twitterJsonData);
+      let tweetCreatedAtTime = await extractCreatedTime(twitterJsonData);
+      let userProfileName = await extractUsername(twitterJsonData);
+      let userActualName = await extractUserActualName(twitterJsonData);
+      let userProfileImageUrl = await extractProfileImageUrl(twitterJsonData);
+      // ! extract user photo, created at time here
+      console.log(tweetId, tweetText);
+      return {
+        tweet: {
+          text: tweetText,
+          id: tweetId,
+          createdTime: tweetCreatedAtTime,
+        },
+        user: {
+          name: userActualName,
+          profileName: userProfileName,
+          url: userProfileImageUrl
+        }
+      };
+    } catch (error) {
+      console.error(error.message);
+      return {
+        error: error.message,
+        full_stack: error,
+      };
+    }
+  } else {
     return {
-      text: tweetText,
-      id: tweetId,
-    };
-  } catch (error) {
-    console.error(error.message);
-    return {
-      error: error.message,
-      full_stack: error,
+      message: tweetResponse.errors[0].title,
+      error: tweetResponse.errors[0].detail,
     };
   }
 }
@@ -130,8 +155,9 @@ function buildURL(tweetId) {
    * @param tweetId -> ``string`` the ID of the tweet to request.
    * @returns fully-formatted Twitter URL.
    */
-  let endpointAndParam = `/tweets?ids=${tweetId}`;
-  return twitter_base_url.concat(endpointAndParam);
+  let endpointAndParam = `/tweets?ids=${tweetId}&tweet.fields=created_at&expansions=author_id&user.fields=created_at,profile_image_url`;
+
+  return twitterBaseUrl.concat(endpointAndParam);
 }
 
 function extractId(tweetResponse) {
@@ -141,11 +167,7 @@ function extractId(tweetResponse) {
    * @param tweetResponse -> tweet response object from GET request sent to /tweets?ids=[ids...]
    * @returns : the ID of the first tweet in the response object.
    * */
-  if (tweetIdIsValid(tweetResponse)) {
-    return tweetResponse.data[0].id;
-  } else {
-    return tweetResponse.errors[0].value;
-  }
+  return tweetResponse.data[0].id;
 }
 
 function extractText(tweetResponse) {
@@ -155,14 +177,45 @@ function extractText(tweetResponse) {
    * @param tweetResponse -> tweet response object from GET request sent to /tweets?ids=[ids...]
    * @returns : the text of the first tweet in the response object.
    * */
-  if (tweetIdIsValid(tweetResponse)) {
-    return tweetResponse.data[0].text;
-  } else {
-    return {
-      message: tweetResponse.errors[0].title,
-      error: tweetResponse.errors[0].detail,
-    };
-  }
+  return tweetResponse.data[0].text;
+}
+
+function extractCreatedTime(tweetResponse) {
+  /**
+   * extract the tweet created time from the tweet response object.
+   *
+   * @param tweetResponse -> tweet response object from GET request sent to /tweets?ids=[ids...]
+   * @returns : the time the tweet was created.
+   * */
+    return tweetResponse.data[0].created_at;
+}
+function extractUsername(tweetResponse) {
+  /**
+   * extract the username of the individual who tweeted the tweet from the tweet response object.
+   *
+   * @param tweetResponse -> tweet response object from GET request sent to /tweets?ids=[ids...]
+   * @returns : the username of the creator of the tweet.
+   * */
+    return tweetResponse.includes.users[0].username;
+}
+function extractProfileImageUrl(tweetResponse) {
+  /**
+   * extract the profile Image URL of thecreator of the tweet from the tweet response object.
+   *
+   * @param tweetResponse -> tweet response object from GET request sent to /tweets?ids=[ids...]
+   * @returns : the profile image url of the creator of the tweet.
+   * */
+    return tweetResponse.includes.users[0].profile_image_url;
+}
+
+function extractUserActualName(tweetResponse) {
+  /**
+   * extract the actual name (not sluggified) of the individual who tweeted the tweet from the tweet response object.
+   *
+   * @param tweetResponse -> tweet response object from GET request sent to /tweets?ids=[ids...]
+   * @returns : the username of the creator of the tweet.
+   * */
+  return tweetResponse.includes.users[0].name;
 }
 
 function tweetIdIsValid(tweetResponse) {
