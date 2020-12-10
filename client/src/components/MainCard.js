@@ -102,9 +102,11 @@ const MainCard = (props) => {
             )
             .required("Enter a Tweet URL"),
         })}
-        onSubmit={(values, actions) => {
-          console.log(values.tweet);
-          props.setTweetSearched(true)
+        onSubmit={ (values, actions) => {
+
+          props.setTweetSearched(true);
+          // set tweet URL to be used in TweetsAnalysis
+          props.setTweetUrl(values.tweet);
         }}
       >
         {(props) => (
@@ -122,7 +124,6 @@ const MainCard = (props) => {
                 <ErrorMessage>{props.errors.tweet}</ErrorMessage>
               ) : null}
             </SearchWrapper>
-            {/* <button type="submit">Submit</button> */}
           </form>
         )}
       </Formik>
