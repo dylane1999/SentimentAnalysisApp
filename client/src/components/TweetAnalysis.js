@@ -8,6 +8,7 @@ import { getSentimentData } from "../actions";
 import GraphSection from "./GraphSection/Index";
 import EmbeddedTweet from "./EmbededTweet";
 
+
 const Root = styled.div`
   display: flex;
   flex-direction: column;
@@ -31,6 +32,39 @@ const TweetAnalysis = () => {
   const handleAnalysisChange = (params) => {
     toggleAnalysis(!documentAnalysis);
   };
+  
+  const tweetId = props.tweetUrl ? props.tweetUrl.split("/")[props.tweetUrl.split("/").length - 1] : false;
+  const result = useAsyncHook(tweetId);
+  
+  function useAsyncHook(tweetId) {
+  /**
+   * asynchronous call to the backend API.
+   * 
+   * @param tweetId: ID of the tweet to retrieve data for.
+   * 
+   * @returns the response from the backend API.
+   */
+  const [tweetData, setTweetData] = useState(""); // initial state set to "", but once the call to the backend is complete the state is changed to response.data
+
+  useEffect(() => {
+    async function fetchTweetData(tweetId) {
+      const response = await getBackendData(tweetId);
+      setTweetData(response.data);
+    }
+
+    console.log(tweetId);
+
+    if (tweetId) {
+      fetchTweetData(tweetId);
+    } else {
+      console.log("escaped!");
+    }
+  }, [tweetId]);
+  return tweetData;
+}
+
+  
+  
   return (
     <Root>
       <AnalysisWrapper>

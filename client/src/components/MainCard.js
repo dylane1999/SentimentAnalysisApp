@@ -141,7 +141,6 @@ const MainCard = (props) => {
                 <ErrorMessage>{props.errors.tweet}</ErrorMessage>
               ) : null}
             </SearchWrapper>
-            {/* <button type="submit">Submit</button> */}
           </form>
         )}
       </Formik>
