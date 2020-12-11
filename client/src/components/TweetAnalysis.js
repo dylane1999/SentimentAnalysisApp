@@ -5,6 +5,7 @@ import { getSentimentData } from "../actions";
 import GraphSection from "./GraphSection/Index";
 import EmbeddedTweet from "./EmbededTweet";
 
+
 const Root = styled.div`
   display: flex;
   flex-direction: column;
@@ -28,8 +29,6 @@ const TweetAnalysis = () => {
   const handleAnalysisChange = (params) => {
     toggleAnalysis(!documentAnalysis);
   };
-
-
   return (
     <Root>
       <AnalysisWrapper>
