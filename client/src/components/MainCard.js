@@ -122,6 +122,7 @@ const MainCard = (props) => {
         onSubmit={(values, actions) => {
           console.log(values.tweet);
           handleSubmission(values);
+          actions.resetForm()
           // props.getSentimentData()
           // props.setTweetSearched(true)
         }}

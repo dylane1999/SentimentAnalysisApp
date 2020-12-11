@@ -1,9 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
-import BarChart from "./GraphSection/BarChart";
-import IOSSwitch from "./GraphSection/IOSSwitch";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import { connect, useSelector } from "react-redux";
+import { connect } from "react-redux";
 import { getSentimentData } from "../actions";
 import GraphSection from "./GraphSection/Index";
 import EmbeddedTweet from "./EmbededTweet";
@@ -31,6 +28,8 @@ const TweetAnalysis = () => {
   const handleAnalysisChange = (params) => {
     toggleAnalysis(!documentAnalysis);
   };
+
+
   return (
     <Root>
       <AnalysisWrapper>
