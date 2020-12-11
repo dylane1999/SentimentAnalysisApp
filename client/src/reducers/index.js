@@ -1,9 +1,12 @@
 import { combineReducers } from "redux";
-import tweetReducer from "./tweetReducer";
+import documentReducer from "./documentReducer";
+import authorReducer from "./authorReducer";
+import sentencesReducer from "./sentencesReducer";
 
 export const appReducer = combineReducers({
-  tweet: tweetReducer,
+  document: documentReducer,
+  author: authorReducer,
+  sentences: sentencesReducer,
 });
 
-
-export default appReducer
+export default appReducer;
