@@ -5,6 +5,8 @@ import Brand from "../icons/Brand";
 import { Formik } from "formik";
 import SearchIcon from "../imgs/SearchIcon.svg";
 import * as Yup from "yup";
+import { connect, useSelector } from "react-redux";
+import { getSentimentData } from "../actions";
 
 const Root = styled.div`
   background-color: #515151;
@@ -32,6 +34,11 @@ const Card = styled.div`
   border-radius: 25px;
   padding: 35px;
   z-index: 1;
+
+  @media(max-width: 500px){
+    width: 85vw;
+ 
+  }
 `;
 
 const Heading = styled.div`
@@ -63,6 +70,11 @@ const SearchBar = styled.input`
   /* identical to box height */
 
   color: #434343;
+
+  @media(max-width: 500px){
+    width: 85vw;
+ 
+  }
 `;
 
 const Spacing = styled.div`
@@ -84,8 +96,13 @@ const SearchWrapper = styled.div`
   height: 75px;
 `;
 
-
 const MainCard = (props) => {
+
+  const handleSubmission = (values) => {
+    const tweetUid = values.tweet.split("/")[values.tweet.split("/").length - 1]
+    props.getSentimentData(tweetUid);
+  };
+
   return (
     <Root>
       <Card>
@@ -104,7 +121,9 @@ const MainCard = (props) => {
         })}
         onSubmit={(values, actions) => {
           console.log(values.tweet);
-          props.setTweetSearched(true)
+          handleSubmission(values);
+          // props.getSentimentData()
+          // props.setTweetSearched(true)
         }}
       >
         {(props) => (
@@ -130,4 +149,10 @@ const MainCard = (props) => {
   );
 };
 
-export default MainCard;
+function mapStatetoProps(state) {
+  return {
+    tweet: state.tweet,
+  };
+}
+
+export default connect(mapStatetoProps, { getSentimentData })(MainCard);
