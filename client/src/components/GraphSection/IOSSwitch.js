@@ -1,6 +1,5 @@
 import { withStyles } from '@material-ui/core/styles';
-import { purple } from '@material-ui/core/colors';
-import {Switch, Typography} from '@material-ui/core';
+import {Switch} from '@material-ui/core';
 
 export const IOSSwitch = withStyles((theme) => ({
   root: {

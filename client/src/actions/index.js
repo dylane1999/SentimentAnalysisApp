@@ -1,11 +1,17 @@
 import axios from "axios";
-import { ADD_DOCUMENT, ADD_AUTHOR, ADD_SENTENCE, SET_LOADING } from "./types";
+import {
+  ADD_DOCUMENT,
+  ADD_AUTHOR,
+  ADD_SENTENCE,
+  SET_LOADING,
+  SWITCH_ANALYSIS,
+} from "./types";
 
 export const getSentimentData = (tweetUid) => async (dispatch) => {
   try {
     dispatch({ type: SET_LOADING, payload: true });
     let sentanceCounter = 0;
-    const res = await axios.post(`/analyze/${tweetUid}`); //post request to analyze sentiment backen
+    const res = await axios.post(`/analyze/${tweetUid}`); //post request to analyze sentiment backend
     dispatch({ type: ADD_AUTHOR, payload: res.data.twitter.user });
 
     dispatch({ type: ADD_DOCUMENT, payload: res.data });
@@ -26,6 +32,12 @@ export const getSentimentData = (tweetUid) => async (dispatch) => {
   } catch (err) {
     console.log(err);
     dispatch({ type: SET_LOADING, payload: false });
-    window.alert("tweet Link incorect, improperly formatted, or from a private account")
+    window.alert(
+      "tweet Link incorect, improperly formatted, or from a private account"
+    );
   }
+};
+
+export const switchAnalysisType = (currentType) => (dispatch) => {
+  dispatch({ type: SWITCH_ANALYSIS, payload: !currentType });
 };
