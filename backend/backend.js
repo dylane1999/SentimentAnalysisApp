@@ -5,7 +5,6 @@ import axios from "axios"; // requests!
 import cors from "cors"; // enforce CORS, will be set to frontend URL when deployed
 import morgan from "morgan"; // useful for tracking request logs
 import helmet from "helmet"; // ensures max security for server
-import StatusCodes from "http-status-codes"; // status codes!
 import bodyParser from "body-parser";
 import language from "@google-cloud/language";
 import dotenv from "dotenv";
@@ -38,7 +37,7 @@ app.post("/analyze/:id", async function (request, response) {
   const result = {}; // response object for frontend, containing two keys: "Google" and "Twitter".
 
   if (tweetIdLength !== 19) {
-    response.status(StatusCodes.BAD_REQUEST).json({
+    response.status(400).json({
       error: "Invalid ID.",
       message: "ID must be a 19-character long Tweet ID.",
     });
@@ -56,14 +55,14 @@ app.post("/analyze/:id", async function (request, response) {
     result["twitter"] = responseForGoogle;
 
     if (responseForGoogleIsError(responseForGoogle)) {
-      response.status(StatusCodes.BAD_REQUEST).json(responseForGoogle);
+      response.status(400).json(responseForGoogle);
     } else {
       // ! implement request for Google NLP API here...
       try {
         let googleNlpResponse = await analyzeSentiment(responseForGoogle.tweet.text);
 
         if (typeof googleNlpResponse === "undefined") {
-          response.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+          response.status(500).json({
             error: "The Response from the Google NLP API is undefined.",
             message:
               "Try again, and if this issue persists contact support or open an issue on GitHub.",
@@ -80,7 +79,7 @@ app.post("/analyze/:id", async function (request, response) {
 
           result["google"] = googleNlpResponse;
 
-          response.status(StatusCodes.OK).json(result); // for now, sending back entire payload from google...
+          response.status(200).json(result); // for now, sending back entire payload from google...
         }
       } catch (error) {
         /**
@@ -92,7 +91,7 @@ app.post("/analyze/:id", async function (request, response) {
          * ¯\_(ツ)_/¯
          */
 
-        response.status(StatusCodes.BAD_GATEWAY).json({
+        response.status(502).json({
           error: error.message,
           message:
             "Try again, and if this issue persists contact support or open an issue on GitHub.",
