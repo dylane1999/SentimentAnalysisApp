@@ -109,7 +109,7 @@ async function parse(aTwitterResponse) {
    */
 
   console.log("parsing twitter response...");
-  if (tweetIdIsValid(aTwitterResponse)) {
+  if (validTweetIdFor(aTwitterResponse)) {
     try {
       let twitterJsonData = aTwitterResponse.data;
       let tweetText = await extractTextFrom(twitterJsonData);
@@ -216,14 +216,14 @@ function extractUserActualNameFrom(aTweetResponse) {
   return aTweetResponse.includes.users[0].name;
 }
 
-function tweetIdIsValid(tweetResponse) {
+function validTweetIdFor(aTweetResponse) {
   /**
-   * helper function to check if the tweet 19-character ID passed is valid.
+   * helper function to check if the tweet 19-character ID passed returns valid data.
    *
-   * @param tweetResponse -> the response from Twitters API /2/tweets?ids
+   * @param aTweetResponse -> the response from Twitters API /2/tweets?ids GET request
    * @returns : true is a key named "data" exists, false otherwise.
    */
-  return tweetResponse.data ? true : false;
+  return aTweetResponse.data ? true : false;
 }
 
 function isErrorFor(aGooglePayload) {
