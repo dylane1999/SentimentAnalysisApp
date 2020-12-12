@@ -115,7 +115,7 @@ async function parse(aTwitterResponse) {
       let tweetText = await extractTextFrom(twitterJsonData);
       let tweetId = await extractIdFrom(twitterJsonData);
       let tweetCreatedAtTime = await extractCreatedTimeFrom(twitterJsonData);
-      let userProfileName = await extractUsername(twitterJsonData);
+      let userProfileName = await extractUsernameFrom(twitterJsonData);
       let userActualName = await extractUserActualName(twitterJsonData);
       let userProfileImageUrl = await extractProfileImageUrl(twitterJsonData);
       // ! extract user photo, created at time here
@@ -187,14 +187,14 @@ function extractCreatedTimeFrom(aTweetResponse) {
    * */
     return aTweetResponse.data[0].created_at;
 }
-function extractUsername(tweetResponse) {
+function extractUsernameFrom(aTweetResponse) {
   /**
    * extract the username of the individual who tweeted the tweet from the tweet response object.
    *
-   * @param tweetResponse -> tweet response object from GET request sent to /tweets?ids=[ids...]
+   * @param aTweetResponse -> tweet response object from GET request sent to /tweets?ids=[ids...]
    * @returns : the username of the creator of the tweet.
    * */
-    return tweetResponse.includes.users[0].username;
+    return aTweetResponse.includes.users[0].username;
 }
 function extractProfileImageUrl(tweetResponse) {
   /**
