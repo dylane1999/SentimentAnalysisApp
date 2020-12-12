@@ -104,7 +104,7 @@ async function parse(aTwitterResponse) {
   /**
    * parses the JSON data retrieved from Twitters response object.
    *
-   * @param twitterResponse -> ``JSON response``, the response from Twitter.
+   * @param aTwitterResponse -> ``JSON response``, the response from Twitter.
    * @returns : an Object containing data about the tweet (tweet text, author, time, etc...)
    */
 
@@ -113,7 +113,7 @@ async function parse(aTwitterResponse) {
     try {
       let twitterJsonData = aTwitterResponse.data;
       let tweetText = await extractText(twitterJsonData);
-      let tweetId = await extractId(twitterJsonData);
+      let tweetId = await extractIdFrom(twitterJsonData);
       let tweetCreatedAtTime = await extractCreatedTime(twitterJsonData);
       let userProfileName = await extractUsername(twitterJsonData);
       let userActualName = await extractUserActualName(twitterJsonData);
@@ -150,7 +150,7 @@ function buildURLFor(aTweetId) {
   /**
    * helper function that builds the twitter URL to send the GET request to.
    *
-   * @param tweetId -> ``string`` the ID of the tweet to request.
+   * @param aTweetId -> ``string`` the ID of the tweet to request.
    * @returns fully-formatted Twitter URL.
    */
   let endpointAndParam = `/tweets?ids=${aTweetId}&tweet.fields=created_at&expansions=author_id&user.fields=created_at,profile_image_url`;
@@ -158,14 +158,14 @@ function buildURLFor(aTweetId) {
   return twitterBaseUrl.concat(endpointAndParam);
 }
 
-function extractId(tweetResponse) {
+function extractIdFrom(aTweetResponse) {
   /**
    * extract the tweet ID from the tweet response object.
    *
-   * @param tweetResponse -> tweet response object from GET request sent to /tweets?ids=[ids...]
+   * @param aTweetResponse -> tweet response object from GET request sent to /tweets?ids=[ids...]
    * @returns : the ID of the first tweet in the response object.
    * */
-  return tweetResponse.data[0].id;
+  return aTweetResponse.data[0].id;
 }
 
 function extractText(tweetResponse) {
