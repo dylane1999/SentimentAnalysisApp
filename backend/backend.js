@@ -58,7 +58,7 @@ app.post("/analyze/:id", async function (request, response) {
     } else {
       // ! implement request for Google NLP API here...
       try {
-        let googleNlpResponse = await analyzeSentiment(googlePayload.tweet.text);
+        let googleNlpResponse = await analyzeSentimentFor(googlePayload.tweet.text);
 
         if (typeof googleNlpResponse === "undefined") {
           response.status(500).json({
@@ -246,22 +246,19 @@ function isErrorFor(aGooglePayload) {
   );
 }
 
-async function analyzeSentiment(doc) {
+async function analyzeSentimentFor(aPlainTextDoc) {
   /**
    * function to make request to google NLP api
    *
-   * @param doc -> the text that will be analyzed
+   * @param aPlainTextDoc -> the plain text that will be analyzed
    * @returns : result from the api, containing a score and magnitude
    */
   try {
     // Instantiates a client
     const client = new language.LanguageServiceClient();
 
-    // The text to analyze
-    const text = doc;
-
     const document = {
-      content: text,
+      content: aPlainTextDoc,
       type: "PLAIN_TEXT",
     };
 
@@ -269,7 +266,7 @@ async function analyzeSentiment(doc) {
     const [result] = await client.analyzeSentiment({ document: document });
     const sentiment = result.documentSentiment;
 
-    console.log(`Text: ${text}`);
+    console.log(`Text: ${aPlainTextDoc}`);
     console.log(`Sentiment score: ${sentiment.score}`);
     console.log(`Sentiment magnitude: ${sentiment.magnitude}`);
 
