@@ -1,15 +1,15 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import BarChart from "./BarChart";
 import IOSSwitch from "./IOSSwitch";
+import { connect } from "react-redux";
+import { switchAnalysisType } from "../../actions";
 
 const Root = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
-
 `;
 
 const AnalysisWrapper = styled.div`
@@ -18,9 +18,8 @@ const AnalysisWrapper = styled.div`
   justify-content: center;
   width: 60vw;
   background-color: #cccccc;
-  @media(max-width: 500px){
+  @media (max-width: 500px) {
     width: 85vw;
- 
   }
 `;
 
@@ -59,7 +58,6 @@ const AnalysisHeadingWrapper = styled.div`
   justify-content: center;
   align-items: center;
 `;
-
 
 // flexbox container for the analysis card
 const AnalysisContainer = styled.div`
@@ -114,22 +112,48 @@ const AnalysisTweetMeta = styled.div`
   padding-bottom: 5%;
 `;
 
-
-
 const Index = (props) => {
-  const [documentAnalysis, toggleAnalysis] = useState(true);
+  const [documentAnalysis, toggleAnalysis] = useState(props.analysisType.documentAnalysis);
+  let documentData = [];
+  let sentenceData = [];
+  let sentenceLabels = [];
 
+  const handleDocumentData = (params) => {
+    if (props.document.documentScore < 0) {
+      documentData.push(props.document.documentScore, props.document.documentMagnitude, -1, 1);
+    } else {
+      documentData.push(props.document.documentScore, props.document.documentMagnitude, 0, 1);
+    }
+  };
+
+  const handleSentenceData = (params) => {
+    props.documentSentences.sentences.forEach(sentence => {
+      sentenceData.push(sentence.score)
+      sentenceLabels.push(sentence.content)
+    });
+    sentenceData.push(0);
+    sentenceData.push(1);
+  }
+
+  console.log(sentenceData, documentData, sentenceLabels)
+  
+
+  // const documentData = [props.document.documentScore, props.document.documentMagnitude, 0, 1]
   const handleAnalysisChange = (params) => {
     toggleAnalysis(!documentAnalysis);
+    props.switchAnalysisType(props.analysisType.documentAnalysis)
   };
+
   return (
     <Root>
+      {handleDocumentData()}
+      {handleSentenceData()}
       {/* <AnalysisHeadingWrapper>
         <AnalysisHeading> Document </AnalysisHeading>{" "}
       </AnalysisHeadingWrapper> */}
       <SwitchWrapper>
         <ToggleWrapper>
-          <ButtonHeading>switch to sentences</ButtonHeading>
+          <ButtonHeading>switch to {props.analysisType.documentAnalysis ? "sentences" : "document"}</ButtonHeading>
           <IOSSwitch
             checked={documentAnalysis}
             onChange={handleAnalysisChange}
@@ -137,15 +161,33 @@ const Index = (props) => {
         </ToggleWrapper>
       </SwitchWrapper>
       <AnalysisWrapper>
-        <BarChart
-          labels={["magnitude", "sentiment score"]}
-          data={[0.5, 0.7, 0, 1]}
-          title={"Document"}
-        />
-        {/* {here conditionally render document vs sentences analysis} */}
+        {!props.loading.applicationLoading ? (
+          props.analysisType.documentAnalysis ? (
+            <BarChart
+              labels={["sentiment score", "magnitude"]}
+              data={documentData}
+              title={"Document"}
+            />
+          ) : (
+            <BarChart
+              labels={sentenceLabels}
+              data={sentenceData}
+              title={"Sentence sentiment score"}
+            />
+          )
+        ) : null}
       </AnalysisWrapper>
-      </Root>
+    </Root>
   );
 };
 
-export default Index;
+function mapStatetoProps(state) {
+  return {
+    document: state.document,
+    documentSentences: state.documentSentences,
+    analysisType: state.analysisType,
+    loading: state.loading,
+  };
+}
+
+export default connect(mapStatetoProps, { switchAnalysisType })(Index);

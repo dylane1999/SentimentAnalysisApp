@@ -1,8 +1,7 @@
 
 import React from 'react';
-import { makeStyles, withStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import LinearProgress from '@material-ui/core/LinearProgress';
 
 // Inspired by the former Facebook spinners.
 const useStylesFacebook = makeStyles((theme) => ({
