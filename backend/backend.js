@@ -34,10 +34,10 @@ const instance = axios.create({
 
 // analyze/id/ endpoint...
 app.post("/analyze/:id", async function (request, response) {
-  const id_length = request.params.id.length;
-  const finalResponseObj = {}; // response object for frontend, containing two keys: "Google" and "Twitter".
+  const tweetIdLength = request.params.id.length;
+  const result = {}; // response object for frontend, containing two keys: "Google" and "Twitter".
 
-  if (id_length !== 19) {
+  if (tweetIdLength !== 19) {
     response.status(StatusCodes.BAD_REQUEST).json({
       error: "Invalid ID.",
       message: "ID must be a 19-character long Tweet ID.",
@@ -53,7 +53,7 @@ app.post("/analyze/:id", async function (request, response) {
     console.log("Response for Google NLP API:\n");
     console.log(responseForGoogle);
 
-    finalResponseObj["twitter"] = responseForGoogle;
+    result["twitter"] = responseForGoogle;
 
     if (responseForGoogleIsError(responseForGoogle)) {
       response.status(StatusCodes.BAD_REQUEST).json(responseForGoogle);
@@ -78,9 +78,9 @@ app.post("/analyze/:id", async function (request, response) {
           console.log(googleNlpResponse.sentences);
           // ! DEBUGGING END
 
-          finalResponseObj["google"] = googleNlpResponse;
+          result["google"] = googleNlpResponse;
 
-          response.status(StatusCodes.OK).json(finalResponseObj); // for now, sending back entire payload from google...
+          response.status(StatusCodes.OK).json(result); // for now, sending back entire payload from google...
         }
       } catch (error) {
         /**
