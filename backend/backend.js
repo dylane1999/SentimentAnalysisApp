@@ -112,7 +112,7 @@ async function parse(aTwitterResponse) {
   if (tweetIdIsValid(aTwitterResponse)) {
     try {
       let twitterJsonData = aTwitterResponse.data;
-      let tweetText = await extractText(twitterJsonData);
+      let tweetText = await extractTextFrom(twitterJsonData);
       let tweetId = await extractIdFrom(twitterJsonData);
       let tweetCreatedAtTime = await extractCreatedTime(twitterJsonData);
       let userProfileName = await extractUsername(twitterJsonData);
@@ -168,14 +168,14 @@ function extractIdFrom(aTweetResponse) {
   return aTweetResponse.data[0].id;
 }
 
-function extractText(tweetResponse) {
+function extractTextFrom(aTweetResponse) {
   /**
    * extract the tweet text from the tweet response object.
    *
-   * @param tweetResponse -> tweet response object from GET request sent to /tweets?ids=[ids...]
+   * @param aTweetResponse -> tweet response object returned from GET request sent to /tweets?ids=[ids...]
    * @returns : the text of the first tweet in the response object.
    * */
-  return tweetResponse.data[0].text;
+  return aTweetResponse.data[0].text;
 }
 
 function extractCreatedTime(tweetResponse) {
