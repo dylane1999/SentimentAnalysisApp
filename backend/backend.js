@@ -15,7 +15,6 @@ const cors_conf = {
   origin: ["http://localhost:5000"], // ! temporary
   methods: ["POST"],
 };
-
 app.use(morgan("common"));
 app.use(cors(cors_conf));
 app.use(helmet());
@@ -26,7 +25,7 @@ app.listen(5000, function () {
 
 const twitterBaseUrl = "https://api.twitter.com/2";
 
-const instance = axios.create({
+const axiosInstance = axios.create({
   baseURL: twitterBaseUrl,
   headers: { Authorization: `Bearer ${process.env.bearer_token}` },
 });
@@ -45,7 +44,7 @@ app.post("/analyze/:id", async function (request, response) {
     let tweetId = request.params.id;
     let twitterFormattedUrl = buildURL(tweetId);
     console.log(`URL for Twitter Request: ${twitterFormattedUrl}`);
-    let responseFromTwitter = await instance.get(twitterFormattedUrl);
+    let responseFromTwitter = await axiosInstance.get(twitterFormattedUrl);
     console.log("Response from Twitter:\n");
     console.log(responseFromTwitter.data);
     let responseForGoogle = await parseTwitterResponse(responseFromTwitter);
