@@ -42,7 +42,7 @@ app.post("/analyze/:id", async function (request, response) {
     });
   } else {
     let tweetId = request.params.id;
-    let twitterFormattedUrl = buildURL(tweetId);
+    let twitterFormattedUrl = buildURLFor(tweetId);
     console.log(`URL for Twitter Request: ${twitterFormattedUrl}`);
     let responseFromTwitter = await axiosInstance.get(twitterFormattedUrl);
     console.log("Response from Twitter:\n");
@@ -146,14 +146,14 @@ async function parseTwitterResponse(twitterResponse) {
     };
   }
 }
-function buildURL(tweetId) {
+function buildURLFor(aTweetId) {
   /**
    * helper function that builds the twitter URL to send the GET request to.
    *
    * @param tweetId -> ``string`` the ID of the tweet to request.
    * @returns fully-formatted Twitter URL.
    */
-  let endpointAndParam = `/tweets?ids=${tweetId}&tweet.fields=created_at&expansions=author_id&user.fields=created_at,profile_image_url`;
+  let endpointAndParam = `/tweets?ids=${aTweetId}&tweet.fields=created_at&expansions=author_id&user.fields=created_at,profile_image_url`;
 
   return twitterBaseUrl.concat(endpointAndParam);
 }
