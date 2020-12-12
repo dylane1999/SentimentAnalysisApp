@@ -47,7 +47,7 @@ app.post("/analyze/:id", async function (request, response) {
     let responseFromTwitter = await axiosInstance.get(twitterFormattedUrl);
     console.log("Response from Twitter:\n");
     console.log(responseFromTwitter.data);
-    let responseForGoogle = await parseTwitterResponse(responseFromTwitter);
+    let responseForGoogle = await parse(responseFromTwitter);
     console.log("Response for Google NLP API:\n");
     console.log(responseForGoogle);
 
@@ -100,7 +100,7 @@ app.post("/analyze/:id", async function (request, response) {
   }
 });
 
-async function parseTwitterResponse(twitterResponse) {
+async function parse(aTwitterResponse) {
   /**
    * parses the JSON data retrieved from Twitters response object.
    *
@@ -109,9 +109,9 @@ async function parseTwitterResponse(twitterResponse) {
    */
 
   console.log("parsing twitter response...");
-  if (tweetIdIsValid(twitterResponse)) {
+  if (tweetIdIsValid(aTwitterResponse)) {
     try {
-      let twitterJsonData = twitterResponse.data;
+      let twitterJsonData = aTwitterResponse.data;
       let tweetText = await extractText(twitterJsonData);
       let tweetId = await extractId(twitterJsonData);
       let tweetCreatedAtTime = await extractCreatedTime(twitterJsonData);
