@@ -47,18 +47,18 @@ app.post("/analyze/:id", async function (request, response) {
     let responseFromTwitter = await axiosInstance.get(twitterFormattedUrl);
     console.log("Response from Twitter:\n");
     console.log(responseFromTwitter.data);
-    let payloadForGoogle = await parse(responseFromTwitter);
+    let googlePayload = await parse(responseFromTwitter);
     console.log("Response for Google NLP API:\n");
-    console.log(payloadForGoogle);
+    console.log(googlePayload);
 
-    result["twitter"] = payloadForGoogle;
+    result["twitter"] = googlePayload;
 
-    if (responseForGoogleIsError(responseForGoogle)) {
-      response.status(400).json(responseForGoogle);
+    if (isErrorFor(googlePayload)) {
+      response.status(400).json(googlePayload);
     } else {
       // ! implement request for Google NLP API here...
       try {
-        let googleNlpResponse = await analyzeSentiment(responseForGoogle.tweet.text);
+        let googleNlpResponse = await analyzeSentiment(googlePayload.tweet.text);
 
         if (typeof googleNlpResponse === "undefined") {
           response.status(500).json({
@@ -226,9 +226,9 @@ function tweetIdIsValid(tweetResponse) {
   return tweetResponse.data ? true : false;
 }
 
-function responseForGoogleIsError(responseForGoogle) {
+function isErrorFor(aGooglePayload) {
   /**
-   * check if response sent to frontend is 200 OK...
+   * check if response is valid data type containing plain text...
    *
    * If the type is an object then it is an error and 400 BAD REQUEST should be sent. Otherwise, 200 OK.
    *
@@ -236,13 +236,13 @@ function responseForGoogleIsError(responseForGoogle) {
    * In this context, .text should never be null.
    * https://stackoverflow.com/questions/8511281/check-if-a-value-is-an-object-in-javascript
    *
-   * @param responseForGoogle -> the response being sent to the frontend.
+   * @param aGooglePayload -> the response being sent to the frontend, which is subsequently used for the Google NLP request.
    * @returns boolean value denoting whether the response is valid or not. true is error, false is not.
    *
    */
   return (
-    typeof responseForGoogle.text === "object" &&
-    responseForGoogle.text !== null
+    typeof aGooglePayload.text === "object" &&
+    aGooglePayload.text !== null
   );
 }
 
