@@ -4,6 +4,9 @@ import { connect } from "react-redux";
 import { getSentimentData } from "../actions";
 import GraphSection from "./GraphSection/Index";
 import EmbeddedTweet from "./EmbededTweet";
+import Backdrop from "@material-ui/core/Backdrop";
+import CircularLoader from "./CircularLoader";
+import { makeStyles } from "@material-ui/core/styles";
 
 const Root = styled.div`
   display: flex;
@@ -22,16 +25,27 @@ const AnalysisWrapper = styled.div`
   justify-content: center;
 `;
 
-const TweetAnalysis = () => {
+const useStyles = makeStyles((theme) => ({
+  backdrop: {
+    zIndex: 50,
+    color: "#fff",
+  },
+}));
+
+const TweetAnalysis = (props) => {
+  const classes = useStyles();
   const [documentAnalysis, toggleAnalysis] = useState(true);
+  const [open, setOpen] = useState(true);
 
   const handleAnalysisChange = (params) => {
     toggleAnalysis(!documentAnalysis);
   };
 
-
   return (
     <Root>
+      <Backdrop className={classes.backdrop} open={props.loading.applicationLoading}>
+        <CircularLoader />
+      </Backdrop>
       <AnalysisWrapper>
         <EmbeddedTweet />
         <GraphSection />
@@ -43,7 +57,7 @@ const TweetAnalysis = () => {
 
 function mapStatetoProps(state) {
   return {
-    tweet: state.tweet,
+    loading: state.loading,
   };
 }
 
