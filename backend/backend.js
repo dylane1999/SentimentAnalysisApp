@@ -47,11 +47,11 @@ app.post("/analyze/:id", async function (request, response) {
     let responseFromTwitter = await axiosInstance.get(twitterFormattedUrl);
     console.log("Response from Twitter:\n");
     console.log(responseFromTwitter.data);
-    let responseForGoogle = await parse(responseFromTwitter);
+    let payloadForGoogle = await parse(responseFromTwitter);
     console.log("Response for Google NLP API:\n");
-    console.log(responseForGoogle);
+    console.log(payloadForGoogle);
 
-    result["twitter"] = responseForGoogle;
+    result["twitter"] = payloadForGoogle;
 
     if (responseForGoogleIsError(responseForGoogle)) {
       response.status(400).json(responseForGoogle);
