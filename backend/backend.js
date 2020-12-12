@@ -58,7 +58,9 @@ app.post("/analyze/:id", async function (request, response) {
     } else {
       // ! implement request for Google NLP API here...
       try {
-        let googleNlpResponse = await analyzeSentimentFor(googlePayload.tweet.text);
+        let googleNlpResponse = await analyzeSentimentFor(
+          googlePayload.tweet.text
+        );
 
         if (typeof googleNlpResponse === "undefined") {
           response.status(500).json({
@@ -117,7 +119,9 @@ async function parse(aTwitterResponse) {
       let tweetCreatedAtTime = await extractCreatedTimeFrom(twitterJsonData);
       let userProfileName = await extractUsernameFrom(twitterJsonData);
       let userActualName = await extractUserActualNameFrom(twitterJsonData);
-      let userProfileImageUrl = await extractProfileImageUrlFrom(twitterJsonData);
+      let userProfileImageUrl = await extractProfileImageUrlFrom(
+        twitterJsonData
+      );
       // ! extract user photo, created at time here
       console.log(tweetId, tweetText);
       return {
@@ -129,8 +133,8 @@ async function parse(aTwitterResponse) {
         user: {
           name: userActualName,
           profileName: userProfileName,
-          url: userProfileImageUrl
-        }
+          url: userProfileImageUrl,
+        },
       };
     } catch (error) {
       console.error(error.message);
@@ -185,7 +189,7 @@ function extractCreatedTimeFrom(aTweetResponse) {
    * @param aTweetResponse -> tweet response object from GET request sent to /tweets?ids=[ids...]
    * @returns : the time the tweet was created.
    * */
-    return aTweetResponse.data[0].created_at;
+  return aTweetResponse.data[0].created_at;
 }
 function extractUsernameFrom(aTweetResponse) {
   /**
@@ -194,7 +198,7 @@ function extractUsernameFrom(aTweetResponse) {
    * @param aTweetResponse -> tweet response object from GET request sent to /tweets?ids=[ids...]
    * @returns : the username of the creator of the tweet.
    * */
-    return aTweetResponse.includes.users[0].username;
+  return aTweetResponse.includes.users[0].username;
 }
 function extractProfileImageUrlFrom(aTweetResponse) {
   /**
@@ -203,7 +207,7 @@ function extractProfileImageUrlFrom(aTweetResponse) {
    * @param aTweetResponse -> tweet response object from GET request sent to /tweets?ids=[ids...]
    * @returns : the profile image url of the creator of the tweet.
    * */
-    return aTweetResponse.includes.users[0].profile_image_url;
+  return aTweetResponse.includes.users[0].profile_image_url;
 }
 
 function extractUserActualNameFrom(aTweetResponse) {
@@ -241,8 +245,7 @@ function isErrorFor(aGooglePayload) {
    *
    */
   return (
-    typeof aGooglePayload.text === "object" &&
-    aGooglePayload.text !== null
+    typeof aGooglePayload.text === "object" && aGooglePayload.text !== null
   );
 }
 
