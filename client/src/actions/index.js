@@ -5,16 +5,19 @@ import {
   ADD_SENTENCE,
   SET_LOADING,
   SWITCH_ANALYSIS,
+  ADD_CREATED_TIME,
 } from "./types";
 
 export const getSentimentData = (tweetUid) => async (dispatch) => {
   try {
     dispatch({ type: SET_LOADING, payload: true });
-    let sentanceCounter = 0;
+    let sentenceCounter = 0;
     const res = await axios.post(`/analyze/${tweetUid}`); //post request to analyze sentiment backend
     dispatch({ type: ADD_AUTHOR, payload: res.data.twitter.user });
 
     dispatch({ type: ADD_DOCUMENT, payload: res.data });
+
+    dispatch({ type: ADD_CREATED_TIME, payload: res.data.twitter.tweet.createdTime });
 
     res.data.google.sentences.map((sentence) => {
       const sentencePayload = {
@@ -23,10 +26,10 @@ export const getSentimentData = (tweetUid) => async (dispatch) => {
           magnitude: sentence.sentiment.magnitude,
           content: sentence.text.content,
         },
-        sentenceIndex: sentanceCounter,
+        sentenceIndex: sentenceCounter,
       };
       dispatch({ type: ADD_SENTENCE, payload: sentencePayload });
-      sentanceCounter++;
+      sentenceCounter++;
     });
     dispatch({ type: SET_LOADING, payload: false });
   } catch (err) {

@@ -123,8 +123,6 @@ const MainCard = (props) => {
           console.log(values.tweet);
           handleSubmission(values);
           actions.resetForm()
-          // props.getSentimentData()
-          // props.setTweetSearched(true)
         }}
       >
         {(props) => (

@@ -48,7 +48,7 @@ function mapStatetoProps(state) {
     },
     tweet: {
       contents: state.document.documentContents,
-      createdTime: "state.document.createdTime -> TODO"
+      createdTime: state.tweetMetaData.createdTime
     },
     document: state.document,
     documentSentences: state.documentSentences,
