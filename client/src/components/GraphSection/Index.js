@@ -118,7 +118,7 @@ const Index = (props) => {
   let sentenceData = [];
   let sentenceLabels = [];
 
-  const handleDocumentData = (params) => {
+  const handleDocumentData = () => {
     if (props.document.documentScore < 0) {
       documentData.push(props.document.documentScore, props.document.documentMagnitude, -1, 1);
     } else {
@@ -126,7 +126,7 @@ const Index = (props) => {
     }
   };
 
-  const handleSentenceData = (params) => {
+  const handleSentenceData = () => {
     props.documentSentences.sentences.forEach(sentence => {
       sentenceData.push(sentence.score)
       sentenceLabels.push(sentence.content)
@@ -139,7 +139,7 @@ const Index = (props) => {
   
 
   // const documentData = [props.document.documentScore, props.document.documentMagnitude, 0, 1]
-  const handleAnalysisChange = (params) => {
+  const handleAnalysisChange = () => {
     toggleAnalysis(!documentAnalysis);
     props.switchAnalysisType(props.analysisType.documentAnalysis)
   };
