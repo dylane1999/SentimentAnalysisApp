@@ -128,7 +128,9 @@ const Index = (props) => {
 
   const handleSentenceData = () => {
     props.documentSentences.sentences.forEach(sentence => {
-      sentenceData.push(sentence.score)
+      // Number.EPSILON represents the difference between 1 and the smallest floating point number greater than 1.
+      // https://stackoverflow.com/questions/11832914/round-to-at-most-2-decimal-places-only-if-necessary
+      sentenceData.push(Math.round((sentence.score + Number.EPSILON)*100)/100)
       sentenceLabels.push(sentence.content)
     });
     sentenceData.push(0);
