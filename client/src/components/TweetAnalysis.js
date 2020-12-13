@@ -29,7 +29,7 @@ const TweetAnalysis = (props) => {
   return (
     <Root>
       <AnalysisWrapper>
-        <EmbeddedTweet />
+        <EmbeddedTweet details= {props}/>
         <GraphSection />
       </AnalysisWrapper>
     </Root>
@@ -40,6 +40,19 @@ const TweetAnalysis = (props) => {
 function mapStatetoProps(state) {
   return {
     loading: state.loading,
+    author: {
+      profileName: state.author.profileName,
+      name: state.author.name,
+      image: state.author.profileImage
+
+    },
+    tweet: {
+      contents: state.document.documentContents,
+      createdTime: "state.document.createdTime -> TODO"
+    },
+    document: state.document,
+    documentSentences: state.documentSentences,
+    analysisType: state.analysisType
   };
 }
 

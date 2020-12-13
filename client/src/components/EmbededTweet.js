@@ -69,11 +69,11 @@ const EmbeddedTweet = (props) => {
         <AnalysisUserInfo>
           {/* !  IMAGE IS COMMENTED OUT BELOW */}
           {/* <img height="65" width ="65" src={result.twitter.user.url} alt="Twitter Profile" style={{borderRadius:15}}></img> */}
-          @{"result.twitter.user.profileName"}
+          @{props.details.author.profileName}
         </AnalysisUserInfo>
-        <AnalysisTweetText>{"result.twitter.tweet.text"}</AnalysisTweetText>
+        <AnalysisTweetText>{props.details.tweet.contents}</AnalysisTweetText>
         <AnalysisTweetMeta>
-          {"result.twitter.tweet.createdTime"}
+          {props.details.tweet.createdTime}
         </AnalysisTweetMeta>
       </AnalysisCard>
     </AnalysisContainer>
