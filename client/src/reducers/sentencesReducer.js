@@ -11,7 +11,7 @@ export default function (state = initialState, action) {
       return {
         ...state,
         sentences: [...state.sentences, action.payload.sentenceData],
-        sentencesByIndex: [...state.sentencesByIndex, action.payload.sentenceIndex]
+        sentencesByIndex: [...state.sentencesByIndex, action.payload.sentenceIndex],
       };
     default:
       return state;

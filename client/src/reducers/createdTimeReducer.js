@@ -5,8 +5,6 @@ const initialState = {
 };
 
 export default function (state = initialState, action) {
-  console.log("IN REDUCER");
-  console.log(action.payload);
   switch (action.type) {
     case ADD_CREATED_TIME:
       return {
@@ -16,4 +14,4 @@ export default function (state = initialState, action) {
     default:
       return state;
   }
-};
+}
