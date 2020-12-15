@@ -6,6 +6,7 @@ import {
   SET_LOADING,
   SWITCH_ANALYSIS,
   ADD_CREATED_TIME,
+  CLEAR_SENTENCES,
 } from "./types";
 
 export const getSentimentData = (tweetUid) => async (dispatch) => {
@@ -17,7 +18,10 @@ export const getSentimentData = (tweetUid) => async (dispatch) => {
 
     dispatch({ type: ADD_DOCUMENT, payload: res.data });
 
-    dispatch({ type: ADD_CREATED_TIME, payload: res.data.twitter.tweet.createdTime });
+    dispatch({
+      type: ADD_CREATED_TIME,
+      payload: res.data.twitter.tweet.createdTime,
+    });
 
     res.data.google.sentences.map((sentence) => {
       const sentencePayload = {
@@ -43,4 +47,8 @@ export const getSentimentData = (tweetUid) => async (dispatch) => {
 
 export const switchAnalysisType = (currentType) => (dispatch) => {
   dispatch({ type: SWITCH_ANALYSIS, payload: !currentType });
+};
+
+export const clearSentences = () => (dispatch) => {
+  dispatch({ type: CLEAR_SENTENCES });
 };

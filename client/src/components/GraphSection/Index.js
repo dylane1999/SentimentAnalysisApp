@@ -113,12 +113,15 @@ const AnalysisTweetMeta = styled.div`
 `;
 
 const Index = (props) => {
-  const [documentAnalysis, toggleAnalysis] = useState(props.analysisType.documentAnalysis);
+  const [documentAnalysis, toggleAnalysis] = useState(
+    props.analysisType.documentAnalysis
+  );
   let documentData = [];
   let sentenceData = [];
   let sentenceLabels = [];
 
   const handleDocumentData = () => {
+    // if document score is below 0 changes the bounds to (-1, 1)
     if (props.document.documentScore < 0) {
       documentData.push(props.document.documentScore, props.document.documentMagnitude, -1, 1);
     } else {
@@ -126,36 +129,44 @@ const Index = (props) => {
     }
   };
 
+  const renameSentences = (sentence) => {
+    if (sentence.length > 20) {
+      let slicedSentence = sentence.slice(0, 21);
+      let sentenceLabel = slicedSentence.concat("...");
+      return sentenceLabel;
+    } else {
+      return sentence;
+    }
+  };
+
   const handleSentenceData = () => {
-    props.documentSentences.sentences.forEach(sentence => {
+    props.documentSentences.sentences.forEach((sentence) => {
       // Number.EPSILON represents the difference between 1 and the smallest floating point number greater than 1.
       // https://stackoverflow.com/questions/11832914/round-to-at-most-2-decimal-places-only-if-necessary
-      sentenceData.push(Math.round((sentence.score + Number.EPSILON)*100)/100);
-      sentenceLabels.push(sentence.content)
+      sentenceData.push(
+        Math.round((sentence.score + Number.EPSILON) * 100) / 100
+      );
+      const sentenceLabel = renameSentences(sentence.content);
+      sentenceLabels.push(sentenceLabel);
     });
-    sentenceData.push(0);
-    sentenceData.push(1);
-  }
+    sentenceData.push(0, 1);
+  };
 
-  console.log(sentenceData, documentData, sentenceLabels)
-  
-
-  // const documentData = [props.document.documentScore, props.document.documentMagnitude, 0, 1]
   const handleAnalysisChange = () => {
     toggleAnalysis(!documentAnalysis);
-    props.switchAnalysisType(props.analysisType.documentAnalysis)
+    props.switchAnalysisType(props.analysisType.documentAnalysis);
   };
 
   return (
     <Root>
       {handleDocumentData()}
       {handleSentenceData()}
-      {/* <AnalysisHeadingWrapper>
-        <AnalysisHeading> Document </AnalysisHeading>{" "}
-      </AnalysisHeadingWrapper> */}
       <SwitchWrapper>
         <ToggleWrapper>
-          <ButtonHeading>switch to {props.analysisType.documentAnalysis ? "sentences" : "document"}</ButtonHeading>
+          <ButtonHeading>
+            switch to{" "}
+            {props.analysisType.documentAnalysis ? "sentences" : "document"}{" "}
+          </ButtonHeading>
           <IOSSwitch
             checked={documentAnalysis}
             onChange={handleAnalysisChange}
@@ -185,10 +196,28 @@ const Index = (props) => {
 
 function mapStatetoProps(state) {
   return {
-    document: state.document,
-    documentSentences: state.documentSentences,
-    analysisType: state.analysisType,
     loading: state.loading,
+    author: {
+      profileName: state.author.profileName,
+      name: state.author.name,
+      image: state.author.profileImage,
+    },
+    tweet: {
+      contents: state.document.documentContents,
+      createdTime: state.tweetMetaData.createdTime,
+    },
+    document: {
+      documentContents: state.document.documentContents,
+      documentScore: state.document.documentScore,
+      documentMagnitude: state.document.documentMagnitude,
+    },
+    documentSentences: {
+      sentences: state.documentSentences.sentences,
+      sentencesByIndex: state.documentSentences.sentencesByIndex,
+    },
+    analysisType: {
+      documentAnalysis: state.analysisType.documentAnalysis,
+    },
   };
 }
 
