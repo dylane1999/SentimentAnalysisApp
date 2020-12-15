@@ -5,7 +5,6 @@ import { getSentimentData } from "../actions";
 import GraphSection from "./GraphSection/Index";
 import EmbeddedTweet from "./EmbededTweet";
 
-
 const Root = styled.div`
   display: flex;
   flex-direction: column;
@@ -29,7 +28,7 @@ const TweetAnalysis = (props) => {
   return (
     <Root>
       <AnalysisWrapper>
-        <EmbeddedTweet details= {props}/>
+        <EmbeddedTweet details={props} />
         <GraphSection />
       </AnalysisWrapper>
     </Root>
@@ -43,16 +42,24 @@ function mapStatetoProps(state) {
     author: {
       profileName: state.author.profileName,
       name: state.author.name,
-      image: state.author.profileImage
-
+      image: state.author.profileImage,
     },
     tweet: {
       contents: state.document.documentContents,
-      createdTime: state.tweetMetaData.createdTime
+      createdTime: state.tweetMetaData.createdTime,
     },
-    document: state.document,
-    documentSentences: state.documentSentences,
-    analysisType: state.analysisType
+    document: {
+      documentContents: state.document.documentContents,
+      documentScore: state.document.documentScore,
+      documentMagnitude: state.document.documentMagnitude,
+    },
+    documentSentences: {
+      sentences: state.documentSentences.sentences,
+      sentencesByIndex: state.documentSentences.sentencesByIndex,
+    },
+    analysisType: {
+      documentAnalysis: state.analysisType.documentAnalysis
+    },
   };
 }
 
