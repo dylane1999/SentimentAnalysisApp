@@ -8,11 +8,11 @@ import helmet from "helmet"; // ensures max security for server
 import bodyParser from "body-parser";
 import language from "@google-cloud/language";
 import dotenv from "dotenv";
-dotenv.config({ path: "./.env" });
+// dotenv.config({ path: "./.env" });
 
 const app = express();
 const cors_conf = {
-  origin: ["http://localhost:5000"], // ! temporary
+  origin: ["http://localhost:8000"], // ! temporary
   methods: ["POST"],
 };
 app.use(morgan("common"));
@@ -29,6 +29,13 @@ const axiosInstance = axios.create({
   baseURL: twitterBaseUrl,
   headers: { Authorization: `Bearer ${process.env.bearer_token}` },
 });
+
+app.get("/", async function (request, response) {
+  response.status(200).json({
+    message: "Hello"
+  })
+})
+
 
 // analyze/id/ endpoint...
 app.post("/analyze/:id", async function (request, response) {
