@@ -2,6 +2,8 @@ version: '3'
 
 services:
   backend:
+    env_file:
+        "./backend/backend.env"
     build:
       context: ./backend
       dockerfile: ./Dockerfile
@@ -15,3 +17,5 @@ services:
     image: "dmurphy1217/twitter-sentiment-frontend"
     ports:
       - "3000:3000"
+    links:
+      - "backend"

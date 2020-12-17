@@ -21,5 +21,9 @@
   },
   "author": "dan murphy",
   "license": "MIT",
-  "type": "module"
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/dylane1999/sentimentanalysisapp.git"
+  }
 }

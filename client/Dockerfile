@@ -8,10 +8,10 @@ WORKDIR /app
 
 COPY ["package.json", "package-lock.json", "./"]
 
-RUN yarn install --production
+RUN npm install --production
 
-COPY . /app
+COPY . .
 
 EXPOSE 3000
 
-CMD ["yarn", "start"]
+CMD ["npm", "start"]
