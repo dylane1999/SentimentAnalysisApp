@@ -1,17 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import BrandBackground from "../imgs/BrandBackground.png";
 import Brand from "../icons/Brand";
-import { Formik } from "formik";
+import { Formik, withFormik } from "formik";
 import SearchIcon from "../imgs/SearchIcon.svg";
 import * as Yup from "yup";
 import { connect, useSelector } from "react-redux";
 import { getSentimentData, clearSentences } from "../actions";
 
-
 const Root = styled.div`
   background-color: #515151;
-  height: 600px;
+  height: 650px;
   width: 100vw;
   display: flex;
   flex-direction: column;
@@ -87,19 +86,39 @@ const ErrorMessage = styled.div`
   padding: 5px;
 `;
 
+const SuggestionBox = styled.div`
+  color: white;
+  font-size: 16px;
+  font-family: aktiv-grotesk;
+  padding: 10px;
+  width: 85%;
+  height: 48px;
+  background: rgba(196, 196, 196, 0.25);
+  border-radius: 25px;
+  text-align: center;
+
+  @media (max-width: 700px) {
+    font-size: 11px;
+    height: 48px;
+    width: 95%;
+  }
+`;
+
 const SearchWrapper = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 75px;
 `;
 
 const MainCard = (props) => {
+  const [analyzed, setanalyzed] = useState(false);
+
   const handleSubmission = (values) => {
     if (props.document.documentContents != null) {
-      props.clearSentences()
+      props.clearSentences();
     }
+    setanalyzed(true);
     const tweetUid = values.tweet.split("/")[
       values.tweet.split("/").length - 1
     ];
@@ -108,6 +127,7 @@ const MainCard = (props) => {
 
   return (
     <Root>
+      {console.log(props.document.documentScore, "props.document ")}
       <Card>
         <Heading>Analyze Your Tweets. </Heading>
       </Card>
@@ -142,6 +162,15 @@ const MainCard = (props) => {
               {props.errors.tweet && props.touched.tweet ? (
                 <ErrorMessage>{props.errors.tweet}</ErrorMessage>
               ) : null}
+              {!props.touched.tweet && !props.errors.tweet && !analyzed ? (
+                <>
+                  <Spacing />
+                  <SuggestionBox>
+                    or try this one
+                    https://twitter.com/Erdayastronaut/status/1335742172071653384
+                  </SuggestionBox>
+                </>
+              ) : null}
             </SearchWrapper>
             {/* <button type="submit">Submit</button> */}
           </form>
@@ -160,4 +189,6 @@ function mapStatetoProps(state) {
     },
   };
 }
-export default connect(mapStatetoProps, { getSentimentData, clearSentences })(MainCard);
+export default connect(mapStatetoProps, { getSentimentData, clearSentences })(
+  MainCard
+);
