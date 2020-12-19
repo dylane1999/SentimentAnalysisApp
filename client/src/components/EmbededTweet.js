@@ -51,6 +51,10 @@ const AnalysisTweetText = styled.div`
   text-overflow: ellipsis;
   width: 400px;
   padding-top: 5%;
+
+  @media (max-width: 500px) {
+    width: 310px; 
+  }
 `;
 
 // formatting for meta-data of the tweet. Right now this is just the time the tweet was created
