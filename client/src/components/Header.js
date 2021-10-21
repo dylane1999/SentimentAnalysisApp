@@ -54,9 +54,6 @@ const Header = () => {
         <StyledLink exact to="/">
           Home 
         </StyledLink>
-        <StyledLink exact to="/about">
-          About
-        </StyledLink>
       </NavlinkWrapper>
     </Root>
   );

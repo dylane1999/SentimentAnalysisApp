@@ -31,7 +31,6 @@ function App() {
         <GlobalStyle />
         <Switch>
           <Route exact path="/" component={AnalysisPage} />
-          <Route exact path="/about" component={AboutPage} />
         </Switch>
       </Router>
     </Provider>

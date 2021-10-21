@@ -167,7 +167,7 @@ const MainCard = (props) => {
                   <Spacing />
                   <SuggestionBox>
                     or try this one
-                    https://twitter.com/Erdayastronaut/status/1335742172071653384
+                    https://twitter.com/WSJ/status/1450288111741702145
                   </SuggestionBox>
                 </>
               ) : null}

@@ -5,40 +5,39 @@ import axios from "axios"; // requests!
 import cors from "cors"; // enforce CORS, will be set to frontend URL when deployed
 import morgan from "morgan"; // useful for tracking request logs
 import helmet from "helmet"; // ensures max security for server
-import bodyParser from "body-parser";
 import language from "@google-cloud/language";
 import dotenv from "dotenv";
-// dotenv.config({ path: "./.env" });
+dotenv.config({ path: "./.env" });
 
 const app = express();
 const cors_conf = {
-  origin: ["http://localhost:8000"], // ! temporary
+  origin: ["http://localhost:80"], // ! temporary
   methods: ["POST"],
 };
 app.use(morgan("common"));
 app.use(cors(cors_conf));
 app.use(helmet());
-app.use(bodyParser.json()); // for parsing application/json
-app.listen(5000, function () {
-  console.log("server starting...");
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json()); // To parse the incoming requests with JSON payloads
+app.listen(80, function () {
+  console.log("server listening on port 80 ...");
 });
 
 const twitterBaseUrl = "https://api.twitter.com/2";
 
 const axiosInstance = axios.create({
   baseURL: twitterBaseUrl,
-  headers: { Authorization: `Bearer ${process.env.bearer_token}` },
+  headers: { Authorization: `Bearer ${process.env.TWITTER_BEARER_TOKEN}` },
 });
 
-app.get("/", async function (request, response) {
+app.get("/health", async function (request, response) {
   response.status(200).json({
-    message: "Hello"
-  })
-})
-
+    status: "up",
+  });
+});
 
 // analyze/id/ endpoint...
-app.post("/analyze/:id", async function (request, response) {
+app.get("/analyze/:id", async function (request, response) {
   const tweetIdLength = request.params.id.length;
   const result = {}; // response object for frontend, containing two keys: "Google" and "Twitter".
 
@@ -51,7 +50,16 @@ app.post("/analyze/:id", async function (request, response) {
     let tweetId = request.params.id;
     let twitterFormattedUrl = buildURLFor(tweetId);
     console.log(`URL for Twitter Request: ${twitterFormattedUrl}`);
-    let responseFromTwitter = await axiosInstance.get(twitterFormattedUrl);
+    let responseFromTwitter;
+    try {
+      responseFromTwitter = await axiosInstance.get(twitterFormattedUrl);
+    } catch (error) {
+      response.status(500).json({
+        error: "The Response from the twitter API is unsuccessful",
+        message:
+          "Try again, and if this issue persists contact support or open an issue on GitHub.",
+      });
+    }
     console.log("Response from Twitter:\n");
     console.log(responseFromTwitter.data);
     let googlePayload = await parse(responseFromTwitter);

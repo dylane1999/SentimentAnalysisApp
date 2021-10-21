@@ -13,7 +13,8 @@ export const getSentimentData = (tweetUid) => async (dispatch) => {
   try {
     dispatch({ type: SET_LOADING, payload: true });
     let sentenceCounter = 0;
-    const res = await axios.post(`/analyze/${tweetUid}`); //post request to analyze sentiment backend
+    console.log("fetching analysis for tweet with id:", tweetUid)
+    const res = await axios.get(`https://backend.twitter-sentiment-analysis.org/analyze/${tweetUid}`); //post request to analyze sentiment backend 
     dispatch({ type: ADD_AUTHOR, payload: res.data.twitter.user });
 
     dispatch({ type: ADD_DOCUMENT, payload: res.data });
