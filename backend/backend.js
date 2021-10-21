@@ -10,12 +10,8 @@ import dotenv from "dotenv";
 dotenv.config({ path: "./.env" });
 
 const app = express();
-const cors_conf = {
-  origin: ["http://localhost:80"], // ! temporary
-  methods: ["POST"],
-};
 app.use(morgan("common"));
-app.use(cors(cors_conf));
+app.use(cors());
 app.use(helmet());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json()); // To parse the incoming requests with JSON payloads

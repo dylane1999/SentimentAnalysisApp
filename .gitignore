@@ -31,3 +31,6 @@ yarn-error.log*
 
 sentiment-analys-1607312730450-70935606bee8.json
 ./backend/sentiment-analys-1607312730450-70935606bee8.json
+
+build
+./client/build
